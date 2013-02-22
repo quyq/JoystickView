@@ -1,6 +1,7 @@
 package com.zerokol.views.joystickview;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -55,13 +56,19 @@ public class JoystickView extends View implements Runnable {
 
 	protected void initJoystickView(AttributeSet attrs) {
 		// Seting the attributes
-		loopInterval = attrs.getAttributeIntValue(
-				"com.zerokol.views.joystickview", "refreshPeriod",
-				DEFAULT_LOOP_INTERVAL);
+		TypedArray a = getContext().getTheme().obtainStyledAttributes(attrs,
+				R.styleable.JoystickView, 0, 0);
 
-		// loopInterval cannot be less then 10ms
-		loopInterval = loopInterval < MIN_LOOP_INTERVAL ? DEFAULT_LOOP_INTERVAL
-				: loopInterval;
+		try {
+			loopInterval = a.getInteger(R.styleable.JoystickView_refreshPeriod,
+					DEFAULT_LOOP_INTERVAL);
+
+			// loopInterval cannot be less then 10ms
+			loopInterval = loopInterval < MIN_LOOP_INTERVAL ? DEFAULT_LOOP_INTERVAL
+					: loopInterval;
+		} finally {
+			a.recycle();
+		}
 
 		// Drawing the circles and lines
 		mainCircle = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -248,6 +255,10 @@ public class JoystickView extends View implements Runnable {
 			int repeatInterval) {
 		this.onJoystickMoveListener = listener;
 		this.loopInterval = repeatInterval;
+	}
+
+	public void setOnJoystickMoveListener(OnJoystickMoveListener listener) {
+		this.onJoystickMoveListener = listener;
 	}
 
 	public static interface OnJoystickMoveListener {
