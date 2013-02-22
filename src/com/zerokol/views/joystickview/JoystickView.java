@@ -1,4 +1,4 @@
-package com.zerokol.views;
+package com.zerokol.views.joystickview;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -11,7 +11,8 @@ import android.view.View;
 public class JoystickView extends View implements Runnable {
 	// Constants
 	private final double RAD = 57.2957795;
-	public final static long DEFAULT_LOOP_INTERVAL = 100; // 100 ms
+	public final static int DEFAULT_LOOP_INTERVAL = 100; // 100ms
+	public final static int MIN_LOOP_INTERVAL = 10; // 10ms
 	public final static int FRONT = 3;
 	public final static int FRONT_RIGHT = 4;
 	public final static int RIGHT = 5;
@@ -23,7 +24,7 @@ public class JoystickView extends View implements Runnable {
 	// Variables
 	private OnJoystickMoveListener onJoystickMoveListener; // Listener
 	private Thread thread = new Thread(this);
-	private long loopInterval = DEFAULT_LOOP_INTERVAL;
+	private int loopInterval;
 	private int xPosition = 0; // Touch x position
 	private int yPosition = 0; // Touch y position
 	private double centerX = 0; // Center view x position
@@ -44,15 +45,25 @@ public class JoystickView extends View implements Runnable {
 
 	public JoystickView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		initJoystickView();
+		initJoystickView(attrs);
 	}
 
 	public JoystickView(Context context, AttributeSet attrs, int defaultStyle) {
 		super(context, attrs, defaultStyle);
-		initJoystickView();
+		initJoystickView(attrs);
 	}
 
-	protected void initJoystickView() {
+	protected void initJoystickView(AttributeSet attrs) {
+		// Seting the attributes
+		loopInterval = attrs.getAttributeIntValue(
+				"com.zerokol.views.joystickview", "refreshPeriod",
+				DEFAULT_LOOP_INTERVAL);
+
+		// loopInterval cannot be less then 10ms
+		loopInterval = loopInterval < MIN_LOOP_INTERVAL ? DEFAULT_LOOP_INTERVAL
+				: loopInterval;
+
+		// Drawing the circles and lines
 		mainCircle = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mainCircle.setColor(Color.WHITE);
 		mainCircle.setStyle(Paint.Style.FILL_AND_STROKE);
@@ -234,7 +245,7 @@ public class JoystickView extends View implements Runnable {
 	}
 
 	public void setOnJoystickMoveListener(OnJoystickMoveListener listener,
-			long repeatInterval) {
+			int repeatInterval) {
 		this.onJoystickMoveListener = listener;
 		this.loopInterval = repeatInterval;
 	}
