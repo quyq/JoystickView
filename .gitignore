@@ -1,5 +1,2 @@
 bin/*
 gen/*
-*.swp
-.classpath
-project.properties
