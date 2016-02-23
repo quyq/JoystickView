@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -157,17 +158,16 @@ public class JoystickView extends View implements Runnable {
 		if (event.getAction() == MotionEvent.ACTION_UP) {
 			xPosition = (int) centerX;
 			yPosition = (int) centerY;
-			thread.interrupt();
+			Log.i("qyq","up");
+			thread.interrupt(); //terminate the thread
 			if (onJoystickMoveListener != null)
 				onJoystickMoveListener.onValueChanged(getAngle(), getPower(),
 						getDirection());
 		}
 		if (onJoystickMoveListener != null
 				&& event.getAction() == MotionEvent.ACTION_DOWN) {
-			if (thread != null && thread.isAlive()) {
-				thread.interrupt();
-			}
-			thread = new Thread(this);
+			Log.i("qyq","down => t creat");
+			thread = new Thread(this); //start a new thread for polling per iterval
 			thread.start();
 			if (onJoystickMoveListener != null)
 				onJoystickMoveListener.onValueChanged(getAngle(), getPower(),
@@ -267,5 +267,6 @@ public class JoystickView extends View implements Runnable {
 				break;
 			}
 		}
+		Log.i("qyq","t end");
 	}
 }
