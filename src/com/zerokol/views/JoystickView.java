@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -13,14 +12,14 @@ public class JoystickView extends View implements Runnable {
 	// Constants
 	private final double RAD = 57.2957795;
 	public final static long DEFAULT_LOOP_INTERVAL = 100; // 100 ms
-	public final static int FRONT = 3;
-	public final static int FRONT_RIGHT = 4;
-	public final static int RIGHT = 5;
-	public final static int RIGHT_BOTTOM = 6;
-	public final static int BOTTOM = 7;
-	public final static int BOTTOM_LEFT = 8;
-	public final static int LEFT = 1;
-	public final static int LEFT_FRONT = 2;
+	public final static int FRONT = 5;
+	public final static int FRONT_RIGHT = 6;
+	public final static int RIGHT = 7;
+	public final static int RIGHT_BOTTOM = 8;
+	public final static int BOTTOM = 1;
+	public final static int BOTTOM_LEFT = 2;
+	public final static int LEFT = 3;
+	public final static int LEFT_FRONT = 4;
 	// Variables
 	private OnJoystickMoveListener onJoystickMoveListener; // Listener
 	private Thread thread = new Thread(this);
@@ -84,7 +83,7 @@ public class JoystickView extends View implements Runnable {
 		super.onSizeChanged(xNew, yNew, xOld, yOld);
 		// before measure, get the center of view
 		xPosition = (int) getWidth() / 2;
-		yPosition = (int) getWidth() / 2;
+		yPosition = (int) getHeight() / 2;
 		int d = Math.min(xNew, yNew);
 		buttonRadius = (int) (d / 2 * 0.25);
 		joystickRadius = (int) (d / 2 * 0.75);
@@ -158,7 +157,6 @@ public class JoystickView extends View implements Runnable {
 		if (event.getAction() == MotionEvent.ACTION_UP) {
 			xPosition = (int) centerX;
 			yPosition = (int) centerY;
-			Log.i("qyq","up");
 			thread.interrupt(); //terminate the thread
 			if (onJoystickMoveListener != null)
 				onJoystickMoveListener.onValueChanged(getAngle(), getPower(),
@@ -166,7 +164,6 @@ public class JoystickView extends View implements Runnable {
 		}
 		if (onJoystickMoveListener != null
 				&& event.getAction() == MotionEvent.ACTION_DOWN) {
-			Log.i("qyq","down => t creat");
 			thread = new Thread(this); //start a new thread for polling per iterval
 			thread.start();
 			if (onJoystickMoveListener != null)
@@ -222,18 +219,8 @@ public class JoystickView extends View implements Runnable {
 		if (lastPower == 0 && lastAngle == 0) {
 			return 0;
 		}
-		int a = 0;
-		if (lastAngle <= 0) {
-			a = (lastAngle * -1) + 90;
-		} else if (lastAngle > 0) {
-			if (lastAngle <= 90) {
-				a = 90 - lastAngle;
-			} else {
-				a = 360 - (lastAngle - 90);
-			}
-		}
 
-		int direction = (int) (((a + 22) / 45) + 1);
+		int direction = (int) ((lastAngle+180+22)/45+1);
 
 		if (direction > 8) {
 			direction = 1;
@@ -267,6 +254,5 @@ public class JoystickView extends View implements Runnable {
 				break;
 			}
 		}
-		Log.i("qyq","t end");
 	}
 }
